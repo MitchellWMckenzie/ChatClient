@@ -94,9 +94,11 @@ namespace Messenger
                 if (file.Length > 0)
                 {
                     LogInInformation infos = (LogInInformation)bf.Deserialize(file);      // Deserialize UserInfo array
+                    txtServerLocation.Text = infos.serverName;
                     if (infos.SaveInfo)
                     {
-                        txtLogIn.Text = infos.Username;
+                        if (infos.Username != "----")
+                            txtLogIn.Text = infos.Username;
                         chkRememberName.IsChecked = true;
                         txtPassword.Focus();
                     }
@@ -124,7 +126,8 @@ namespace Messenger
                 if (chkRememberName.IsChecked == true)
                     lg.Username = txtLogIn.Text;
                 else
-                    lg.Username = "";
+                    lg.Username = "----";
+                lg.serverName = txtServerLocation.Text;
                 lg.SaveInfo = (bool)chkRememberName.IsChecked;
                 bf.Serialize(file, lg);  // Serialize UserInfo array
                 file.Close();
@@ -494,8 +497,7 @@ namespace Messenger
             string password = txtPassword.Password.Trim();
             string serverAddress = txtServerLocation.Text.Trim();
 
-            if (chkRememberName.IsChecked == true)
-                saveUsernameToFile();
+            saveUsernameToFile();
 
             //Start the task for running the checks and progress bar moving
             await Task.Run(async () =>

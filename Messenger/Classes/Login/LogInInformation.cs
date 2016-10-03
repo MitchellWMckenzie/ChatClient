@@ -11,6 +11,6 @@ namespace Messenger.Classes.Login
     {
         public string Username{ get; set; }
         public bool SaveInfo { get; set; }
-
+        public string serverName { get; set; }
     }
 }
