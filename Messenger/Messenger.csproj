@@ -94,8 +94,8 @@
     <Compile Include="Classes\Snipping Tool\Snipping Tool.Designer.cs">
       <DependentUpon>Snipping Tool.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\StaticReasources\FlshWindow.cs" />
-    <Compile Include="Classes\StaticReasources\FontSize.cs" />
+    <Compile Include="Classes\StaticResources\FlshWindow.cs" />
+    <Compile Include="Classes\StaticResources\FontSize.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

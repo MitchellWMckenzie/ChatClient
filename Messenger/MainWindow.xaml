@@ -261,7 +261,7 @@
                                                 <WrapPanel>
                                                     <TextBlock Text="{Binding Path=message}" Foreground="{Binding Path=foreground}" FontFamily="{Binding Path=font}" FontSize="{Binding Path=fontSize}" Visibility="{Binding Path=msgVis}" TextWrapping="Wrap">
                                                         <Hyperlink NavigateUri="{Binding Path=url}" Foreground="{Binding Path=linkForeground}" FontFamily="{Binding Path=linkFont}" FontSize="{Binding Path=linkFontSize}" RequestNavigate="Hyperlink_RequestNavigate">
-                                                            <TextBlock Text="{Binding Path=url}" />
+                                                            <TextBlock Text="{Binding Path=url}" TextWrapping="Wrap" />
                                                         </Hyperlink>
                                                     </TextBlock>
                                                     <Image Source="{Binding Path=ImgSource}" Width="{Binding Path=ImgWidth}"  Height="{Binding Path=ImgHeight}" Visibility="{Binding Path=ImgVis}"/>
