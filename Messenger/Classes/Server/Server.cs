@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Windows;
+using System.Collections.ObjectModel;
 
 namespace Messenger.Classes.Server
 {
@@ -361,141 +362,226 @@ namespace Messenger.Classes.Server
                 {
                     byte type = br.ReadByte();  // Get incoming packet type.
 
-                    if (type == Protocols.IM_IsAvailable)
+                    switch (type)
                     {
-                        string user = br.ReadString();
-                        bool isAvail = br.ReadBoolean();
-                        OnUserAvail(new IMAvailEventArgs(user, isAvail));
-                    }
-                    else if (type == Protocols.IM_Received)
-                    {
-                        int id = int.Parse(br.ReadString());
-                        string from = br.ReadString();
-                        string msg = br.ReadString();
-                        string color = br.ReadString();
-                        string font = br.ReadString();
-                        string size = br.ReadString();
-                        string textColor = br.ReadString();
-                        bool canClear = bool.Parse(br.ReadString());
-                        OnMessageReceived(new IMReceivedEventArgs(id, from, msg, color, font, size, textColor, canClear));
-
-                    }
-                    else if (type == Protocols.IM_NewUser)
-                    {
-                        string user = br.ReadString();
-                        string userColor = br.ReadString();
-                        users.Add(user);
-                        userColors.Add(userColor);
-                        window.addUserToList(new Users(user, userColor));
-                        window.refreshList();
-                    }
-                    else if (type == Protocols.IM_RemoveUser)
-                    {
-                        string user = br.ReadString();
-                        users.Remove(user);
-                        //window.removeUserFromList(user);
-                    }
-                    else if (type == Protocols.IM_GetAllUsers)
-                    {
-                        string user = br.ReadString();
-                        string[] split = user.Split('+');
-                        string userColrs = br.ReadString();
-                        string[] splitColors = userColrs.Split('+');
-                        for (int x = 0; x < split.Length; x++)
+                        /***************************************************************
+                         * Purpose: Received when new user is available 
+                         * In use : NO
+                         * Attribs:
+                         *        [string] User  - The username of the user
+                         *        [bool] isAvail - If the user is available or not  
+                         **************************************************************/
+                        case Protocols.IM_IsAvailable:
                         {
-                            if (!split[x].Equals(_username) && !users.Contains(split[x]))
-                            {
-                                users.Add(split[x]);
-                                userColors.Add(splitColors[x]);
-                                window.addUserToList(new Users(split[x], splitColors[x]));
-                                //window.listofUsers.Add(new Users(split[x], splitColors[x]));
-                                window.refreshList();
-                            }
+                            string user = br.ReadString();
+                            bool isAvail = br.ReadBoolean();
+                            OnUserAvail(new IMAvailEventArgs(user, isAvail));
+                            break;
                         }
-                    }
-                    else if (type == Protocols.IM_PICTURE)
-                    {
 
-                        string personWhoSent = br.ReadString();
-                        string image = br.ReadString();
-
-                        if (CanReceivePics)
+                        /***************************************************************
+                         * Purpose: Received when a user connects to the server
+                         * In use : YES
+                         * Attribs:
+                         *        [string] User  - The username of the user
+                         *        [string] statusColor - Current status color of user
+                         **************************************************************/
+                        case Protocols.IM_NewUser:
                         {
-                            Image img = Base64ToImage(image);
-                            Bitmap temp = new Bitmap(img);
-                            BitmapSource bitmap = ConvertBitmap(temp);
-                            //System.Windows.Clipboard.SetImage(bitmap);
-                            if (PasteToClipboard)
+                            string user = br.ReadString();
+                            string statusColor = br.ReadString();
+                            users.Add(user);
+                            userColors.Add(statusColor);
+                            window.addUserToList(new Users(user, statusColor));
+                            window.refreshList();
+                            break;
+                        }
+
+                        /***************************************************************
+                         * Purpose: Received when a user disconnects from the server
+                         * In use : YES
+                         * Attribs:
+                         *        [string] User  - The username of the user
+                         **************************************************************/
+                        case Protocols.IM_RemoveUser:
+                        {
+                            string user = br.ReadString();
+                            users.Remove(user);
+                            window.removeUserFromList(user);
+                            break;
+                        }
+
+                        /***************************************************************
+                         * Purpose: Received during first connection with the server to
+                         *          get the current users connected to the server
+                         * In use : YES
+                         * Attribs:
+                         *        [string] User  - A string of usernames separated by +
+                         *        [string] statusColors  - the status of the usernames
+                         *                                 respectively separated by +
+                         **************************************************************/
+                        case Protocols.IM_GetAllUsers:
+                        {
+                            string user = br.ReadString();
+                            string[] split = user.Split('+');
+                            string statusColors = br.ReadString();
+                            string[] splitColors = statusColors.Split('+');
+                            for (int x = 0; x < split.Length; x++)
                             {
-                                Application.Current.Dispatcher.Invoke(new Action(() =>
+                                if (!split[x].Equals(_username) && !users.Contains(split[x]))
                                 {
-                                    System.Windows.Clipboard.SetImage(bitmap);
-                                }));
+                                    users.Add(split[x]);
+                                    userColors.Add(splitColors[x]);
+                                    window.addUserToList(new Users(split[x], splitColors[x]));
+                                    window.refreshList();
+                                }
                             }
-                            Application.Current.Dispatcher.Invoke((Action)delegate {
-                                PictureScreen.PictureScreen ps = new PictureScreen.PictureScreen();
-                                ps.setPicture(image, img.Width, img.Height + 35, personWhoSent + "'s picture sent [" + DateTime.Now + "]", window);
-                                ps.Show();
-                            }); 
+                            break;
                         }
-                            /*window.imageNeedsToBePaste = true;
-                            window.imageToPaste = image;
-                            window.picSentBy = personWhoSent;*/
 
-                    }
-                    else if (type == Protocols.UP_PicStatus)
-                    {
-                        string name = br.ReadString();
-                        var tooUpdate = window.listofUsers.Single(x => x.Name.Equals(name));
-
-                        tooUpdate.Color = br.ReadString();
-                    }
-                    else if (type == Protocols.UP_Banned)
-                    {
-                        banned = true;
-                        OnMessageReceived(new IMReceivedEventArgs(-1, "SYSTEM", "You have been banned.", "White", "Segoe UI", "16", "White", false));
-                        CloseConnectionWithServer();
-                    }
-                    else if (type == Protocols.UP_Remove_Message)
-                    {
-                        int messID = int.Parse(br.ReadString());
-                        /*Message msg = null;
-                        for (int i = 0; i < window.txtMessages.Count; i++)
+                        /***************************************************************
+                         * Purpose: Received when a picture is sent to the server. It is
+                         *          received in a base64 string format, the program 
+                         *          converts the image and displays it.
+                         * In use : YES
+                         * Attribs:
+                         *        [string] personWhoSent - Username of the user
+                         *        [string] image  - A base64 representation of the image
+                         *                          that was sent.
+                         **************************************************************/
+                        case Protocols.IM_PICTURE:
                         {
-                            if (((Message)window.txtMessages.ElementAt(i)).messageID == messID)
+                            string personWhoSent = br.ReadString();
+                            string image = br.ReadString();
+
+                            if (CanReceivePics)
                             {
-                                msg = window.txtMessages.ElementAt(i);
-                            }
-                        }
-                        msg.clrBtnWidth = "0";
-                        msg.clrVis = Visibility.Hidden;
-                        msg.textInformation = new ObservableCollection<TextInfo>();
-                        msg.textInformation.Add(new TextInfo(null, "", "", Visibility.Hidden, "<Message Removed>", msg.args.TextColor, msg.args.Font, msg.args.Size, Visibility.Visible));
-                        window.updateMessages();*/
-                    }
-                    else if (type == Protocols.IM_Reconnecting)
-                    {
-                        OnMessageReceived(new IMReceivedEventArgs(-1, "SYSTEM", "Server restarting. Disconnecting...", "White", "Segoe UI", "16", "White", false));
-                        /*window.clearUsers();
-                        restarting = true;
-                        aTimer = new System.Timers.Timer();
-                        aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-                        aTimer.Interval = 8000;
-                        aTimer.Enabled = true;
-                        CloseConn();*/
-                    }
-                    else if (type == Protocols.UP_Messaging)
-                    {
-                        string name = br.ReadString();
-                        var tooUpdate = window.listofUsers.Single(x => x.Name.Equals(name));
+                                Image img = Base64ToImage(image);
+                                Bitmap temp = new Bitmap(img);
+                                BitmapSource bitmap = ConvertBitmap(temp);
 
-                        if (br.ReadString().Equals("true"))
-                        {
-                            tooUpdate.Width = 16;
+                                if (PasteToClipboard)
+                                {
+                                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                                    {
+                                        System.Windows.Clipboard.SetImage(bitmap);
+                                    }));
+                                }
+                                Application.Current.Dispatcher.Invoke((Action)delegate {
+                                    PictureScreen.PictureScreen ps = new PictureScreen.PictureScreen();
+                                    ps.setPicture(image, img.Width, img.Height + 35, personWhoSent + "'s picture sent [" + DateTime.Now + "]", window);
+                                    ps.Show();
+                                });
+                            }
+                            break;
                         }
-                        else
+
+                        /***************************************************************
+                         * Purpose: Received when a user changes the status of their
+                         *          client
+                         * In use : YES
+                         * Attribs:
+                         *        [string] User  - The username of the user
+                         *        [string] Color - The status of the client
+                         **************************************************************/
+                        case Protocols.UP_PicStatus:
                         {
-                            tooUpdate.Width = 0;
+                            string user = br.ReadString();
+                            var tooUpdate = window.listofUsers.Single(x => x.Name.Equals(user));
+                            tooUpdate.Color = br.ReadString();
+                            break;
+                        }
+
+                        /***************************************************************
+                         * Purpose: Received when a new message is sent from a user or
+                         *          the server. All messages are sent with this protocol
+                         * In use : YES
+                         * Attribs:
+                         *        [int] id           - The id of the message
+                         *        [string] from      - Username of the sender
+                         *        [string] msg       - The contents of the message
+                         *        [string] color     - The color of the users name
+                         *        [string] font      - Font of the message
+                         *        [string] size      - Size of the message text
+                         *        [string] textcolor - Color of the message text
+                         *        [bool] canClear    - If the user has permission to 
+                         *                             clear the contents of the message
+                         **************************************************************/
+                        case Protocols.IM_Received:
+                        {
+                            int id = int.Parse(br.ReadString());
+                            string from = br.ReadString();
+                            string msg = br.ReadString();
+                            string color = br.ReadString();
+                            string font = br.ReadString();
+                            string size = br.ReadString();
+                            string textColor = br.ReadString();
+                            bool canClear = bool.Parse(br.ReadString());
+                            OnMessageReceived(new IMReceivedEventArgs(id, from, msg, color, font, size, textColor, canClear));
+                            break;
+                        }
+
+                        /***************************************************************
+                         * Purpose: Received when the user gets banned from the server
+                         * In use : YES
+                         * Attribs:
+                         *        None. If the user receives this message, it means that
+                         *        they were banned and the connection with the server is
+                         *        closed.
+                         **************************************************************/
+                        case Protocols.UP_Banned:
+                        {
+                            banned = true;
+                            OnMessageReceived(new IMReceivedEventArgs(-1, "SYSTEM", "You have been banned.", "White", "Segoe UI", "16", "White", false));
+                            CloseConnectionWithServer();
+                            break;
+                        }
+
+                        /***************************************************************
+                         * Purpose: Received when a Mod+ deletes a message
+                         * In use : YES
+                         * Attribs:
+                         *        [int] messID - The id of the message to be removed
+                         **************************************************************/
+                        case Protocols.UP_Remove_Message:
+                        {
+                            int messID = int.Parse(br.ReadString());
+                            Message msg = null;
+                            for (int i = 0; i < window.txtMessages.Count; i++)
+                            {
+                                if (((Message)window.txtMessages.ElementAt(i)).messageID == messID)
+                                {
+                                    msg = window.txtMessages.ElementAt(i);
+                                }
+                            }
+                            msg.clrBtnWidth = "0";
+                            msg.clrVis = Visibility.Hidden;
+                            msg.textInformation = new ObservableCollection<TextInfo>();
+                            msg.textInformation.Add(new TextInfo(null, "", "", Visibility.Hidden, "<Message Removed>", msg.args.TextColor, msg.args.Font, msg.args.Size, Visibility.Visible));
+                            window.updateMessages();
+                            break;
+                        }
+
+                        /***************************************************************
+                         * Purpose: Received when a user starts typing
+                         * In use : YES
+                         * Attribs:
+                         *        [string] name - The username of the user
+                         **************************************************************/
+                        case Protocols.UP_Messaging:
+                        {
+                            string name = br.ReadString();
+                            var tooUpdate = window.listofUsers.Single(x => x.Name.Equals(name));
+
+                            if (br.ReadString().Equals("true"))
+                            {
+                                tooUpdate.Width = 16;
+                            }
+                            else
+                            {
+                                tooUpdate.Width = 0;
+                            }
+                            break;
                         }
                     }
                 }

@@ -182,7 +182,6 @@ namespace Messenger
 
         #endregion
 
-
         #region Send Message
 
         private void SendMessage(object sender, RoutedEventArgs e)
@@ -230,6 +229,14 @@ namespace Messenger
                     keyDown = false;
                 }
             }
+        }
+
+        public void updateMessages()
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                txtMessagesView.Items.Refresh();
+            }));
         }
 
         #endregion
