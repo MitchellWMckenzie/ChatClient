@@ -187,6 +187,9 @@ namespace Messenger
 
         #region Send Message
 
+        /// <summary>
+        /// Sends the message to the server when the button is clicked or when called from another method
+        /// </summary>
         private void SendMessage(object sender, RoutedEventArgs e)
         {
             if (txtMessage.Text.Trim().Length != 0)
@@ -200,6 +203,10 @@ namespace Messenger
             }
         }
 
+        /// <summary>
+        /// Called everytime a key is typed in the message sending box. Used to keep track of multiple lines
+        /// in the message box
+        /// </summary>
         bool keyDown = false;
         private void UpdateMessanging(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -234,6 +241,9 @@ namespace Messenger
             }
         }
 
+        /// <summary>
+        /// Refreshes the messages in the listview
+        /// </summary>
         public void updateMessages()
         {
             Dispatcher.Invoke(new Action(() =>

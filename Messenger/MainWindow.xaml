@@ -300,7 +300,7 @@
                     <ColumnDefinition Width="130"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBox x:Name="txtMessage" TextWrapping="Wrap" FontSize="14" PreviewKeyDown="UpdateMessanging" KeyDown="UpdateMessanging" KeyUp="UpdateMessanging"/>
+                <TextBox x:Name="txtMessage" TextWrapping="Wrap" FontSize="14" PreviewKeyDown="UpdateMessanging" KeyDown="UpdateMessanging" KeyUp="UpdateMessanging" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
 
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
