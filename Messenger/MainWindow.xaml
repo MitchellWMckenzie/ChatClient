@@ -84,7 +84,7 @@
 
                 <!-- Input Fields -->
                 <TextBox x:Name="txtLogIn" Grid.Column="1" Grid.Row="1" Margin="5,5,15,5" Controls:TextBoxHelper.Watermark="Username" FontSize="16" TabIndex="0"/>
-                <PasswordBox x:Name="txtPassword" Grid.Column="1" Grid.Row="2" Margin="5,5,15,5" FontSize="16"  TabIndex="1"/>
+                <PasswordBox x:Name="txtPassword" Grid.Column="1" Grid.Row="2" Margin="5,5,15,5" FontSize="16"  TabIndex="1" PreviewKeyDown="keyDownPassword"/>
                 <CheckBox x:Name="chkRememberName" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" Margin="5,0,0,0" TabIndex="4">
                     <Label >
                         Remember Name

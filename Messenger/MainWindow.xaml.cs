@@ -455,6 +455,16 @@ namespace Messenger
         #endregion
 
         #region Log In Button
+
+        /// <summary>
+        /// Handles when the user presses enter on the password box
+        /// </summary>
+        private void keyDownPassword(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                LogIn(sender, e);
+        }
+
         /// <summary>
         /// Used for when loading the program.
         /// </summary>
