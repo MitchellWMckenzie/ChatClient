@@ -261,8 +261,8 @@
                                             <DataTemplate>
                                                 <WrapPanel>
                                                     <TextBlock Text="{Binding Path=message}" Foreground="{Binding Path=foreground}" FontFamily="{Binding Path=font}" FontSize="{Binding Path=fontSize}" Visibility="{Binding Path=msgVis}" TextWrapping="Wrap">
-                                                        <Hyperlink NavigateUri="{Binding Path=url}" Foreground="{Binding Path=linkForeground}" FontFamily="{Binding Path=linkFont}" FontSize="{Binding Path=linkFontSize}" RequestNavigate="Hyperlink_RequestNavigate">
-                                                            <TextBlock Text="{Binding Path=url}" TextWrapping="Wrap" />
+                                                        <Hyperlink NavigateUri="{Binding Path=url}" Foreground="{Binding Path=linkForeground}" FontFamily="{Binding Path=linkFont}" FontSize="{Binding Path=linkFontSize}" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="{x:Null}">
+                                                            <TextBlock Text="{Binding Path=url}" TextWrapping="Wrap" TextDecorations="Underline" />
                                                         </Hyperlink>
                                                     </TextBlock>
                                                     <Image Source="{Binding Path=ImgSource}" Width="{Binding Path=ImgWidth}"  Height="{Binding Path=ImgHeight}" Visibility="{Binding Path=ImgVis}"/>
@@ -408,7 +408,7 @@
                         <Label Grid.Row="4" Grid.ColumnSpan="2" HorizontalAlignment="Center" FontWeight="Bold">
                             Picture Options
                         </Label>
-                        <CheckBox x:Name="chkAvailable" Grid.Row="5" Grid.ColumnSpan="2"  Content="Available to receive pictures" HorizontalAlignment="Right" IsChecked="True" Margin="0,0,30,0" VerticalAlignment="Center"/>
+                        <CheckBox x:Name="chkAvailable" Grid.Row="5" Grid.ColumnSpan="2"  Content="Available to receive pictures" HorizontalAlignment="Right" IsChecked="True" Margin="0,0,30,0" VerticalAlignment="Center" Checked="availableToReceive" Unchecked="availableToReceive"/>
                         <CheckBox x:Name="chkClipboard" Grid.Row="6" Grid.ColumnSpan="2" Content="Copy sent pictures to Clipboard" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center"/>
 
                     </Grid>

@@ -271,6 +271,25 @@ namespace Messenger.Classes.Server
         #endregion
 
         #region Settings
+        public void updateStatus(bool check)
+        {
+            if (_conn && !banned)
+            {
+                bw.Write(Protocols.UP_PicStatus);
+                if (check)
+                {
+                    CanReceivePics = true;
+                    bw.Write("Green");
+                }
+                else
+                {
+                    CanReceivePics = false;
+                    bw.Write("Red");
+                }
+                bw.Flush();
+            }
+        }
+
         /// <summary>
         /// 1 - Name Color
         /// 2 - Font
@@ -496,13 +515,15 @@ namespace Messenger.Classes.Server
                             string personWhoSent = br.ReadString();
                             string image = br.ReadString();
 
+                            //If the settings to receive pictures is checked
                             if (CanReceivePics)
                             {
                                 Image img = Base64ToImage(image);
                                 Bitmap temp = new Bitmap(img);
                                 BitmapSource bitmap = ConvertBitmap(temp);
 
-                                if (PasteToClipboard)
+                                //If copy to clipboard is checked
+                                if (window.chkClipboard.IsChecked == true)
                                 {
                                     Application.Current.Dispatcher.Invoke(new Action(() =>
                                     {
@@ -627,7 +648,14 @@ namespace Messenger.Classes.Server
                             break;
                         }
 
-
+                        /***************************************************************
+                         * Purpose: Received when a restart command is sent to the 
+                         *          server.
+                         * In use : YES
+                         * Attribs:
+                         *        None. Once the command is received the program
+                         *        restarts
+                         **************************************************************/
                         case Protocols.IM_Reconnecting:
                         {
                             OnMessageReceived(new IMReceivedEventArgs(-1, "SYSTEM", "Server restarting. Disconnecting...", 
@@ -654,6 +682,9 @@ namespace Messenger.Classes.Server
 
         #region Timer Functions
 
+        /// <summary>
+        /// Sets up the timers with the settings required
+        /// </summary>
         private void setUpTimers()
         {
             //Set up the timer

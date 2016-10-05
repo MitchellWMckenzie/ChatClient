@@ -299,6 +299,12 @@ namespace Messenger
 
         #region Settings
 
+        private void availableToReceive(object sender, RoutedEventArgs e)
+        {
+            if (server != null && server.Connected)
+                server.updateStatus(chkAvailable.IsChecked == true);
+        }
+
         /// <summary>
         /// Used to update the information of the user. Updates the settings window.
         /// </summary>

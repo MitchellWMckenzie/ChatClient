@@ -65,7 +65,7 @@ namespace Messenger.Classes
                 }
                 else
                 {
-                    nameForeground = window.colors["Black"];
+                    nameForeground = window.colors["White"];
                 }
             }
             else if (args.Color != "" && args.Color != "-")
