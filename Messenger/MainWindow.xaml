@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:Messenger"
-        Title="Microsoft Word"
+        Title="ChitChat"
         Height="416.975"
         Width="525" ResizeMode="NoResize"
         Closing="MainWindow_Closing"
@@ -392,7 +392,7 @@
                         </Label>
 
                         <Label Grid.Column="0" Grid.Row="1" Content="Name Color:" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                        <ComboBox x:Name="clrMessage" Grid.Column="1" Grid.Row="1">
+                        <ComboBox x:Name="clrMessage" Grid.Column="1" Grid.Row="1" DropDownClosed="cbo_NameClose">
                             <ComboBoxItem IsSelected="True">White</ComboBoxItem>
                             <ComboBoxItem>Blue</ComboBoxItem>
                             <ComboBoxItem>Green</ComboBoxItem>
@@ -430,7 +430,7 @@
                         </Label>
 
                         <Label x:Name="lblFont" Grid.Column="0" Grid.Row="1" Content="Font:" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                        <ComboBox x:Name="clrFont" Grid.Column="1" Grid.Row="1" VerticalAlignment="Bottom">
+                        <ComboBox x:Name="clrFont" Grid.Column="1" Grid.Row="1" VerticalAlignment="Bottom" DropDownClosed="cbo_FontClose">
                             <ComboBoxItem IsSelected="True">Segoe UI</ComboBoxItem>
                             <ComboBoxItem>SimHei</ComboBoxItem>
                             <ComboBoxItem>Stencil</ComboBoxItem>
@@ -441,7 +441,7 @@
                         </ComboBox>
 
                         <Label x:Name="lblFontSize" Grid.Column="0" Grid.Row="2" Content="Font Size:" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                        <ComboBox x:Name="clrFontSize" Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom">
+                        <ComboBox x:Name="clrFontSize" Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" DropDownClosed="cbo_FontSizeClose">
                             <ComboBoxItem>10</ComboBoxItem>
                             <ComboBoxItem IsSelected="True">12</ComboBoxItem>
                             <ComboBoxItem>14</ComboBoxItem>
@@ -452,7 +452,7 @@
                         </ComboBox>
 
                         <Label x:Name="lblMessageColor" Grid.Column="0" Grid.Row="3" Content="Message Color:" VerticalAlignment="Center" HorizontalAlignment="Right"  />
-                        <ComboBox x:Name="clrMessageColor" Grid.Column="1" Grid.Row="3" VerticalAlignment="Bottom">
+                        <ComboBox x:Name="clrMessageColor" Grid.Column="1" Grid.Row="3" VerticalAlignment="Bottom" DropDownClosed="cbo_MessageColorClose">
                             <ComboBoxItem IsSelected="True">White</ComboBoxItem>
                             <ComboBoxItem>Blue</ComboBoxItem>
                             <ComboBoxItem>Green</ComboBoxItem>

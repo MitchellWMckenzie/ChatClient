@@ -86,6 +86,9 @@ namespace Messenger.Classes.Server
 
         #endregion
 
+
+        #region Set Up Connection
+
         public bool tryConnectionToServer(string serverAddress)
         {
             this.serverAddress = serverAddress;
@@ -194,6 +197,111 @@ namespace Messenger.Classes.Server
             }
         }
 
+        void SetupConn()  // Setup connection and login
+        {
+            // Hello OK, so answer.
+            bw.Write(Protocols.IM_Hello);
+
+            bw.Write(_reg ? Protocols.IM_Register : Protocols.IM_Login);  // Login or register
+            bw.Write(_username);
+            bw.Write(_password);
+            bw.Flush();
+
+            byte ans = br.ReadByte();  // Read answer.
+            if (ans == Protocols.IM_OK)  // Login/register OK
+            {
+
+                string isMod = br.ReadString();
+                string nameColor = br.ReadString();
+                string fontType = br.ReadString();
+                string fontsize = br.ReadString();
+                string messagecolor = br.ReadString();
+
+                byte amountOfEmojiis = br.ReadByte();
+                while (amountOfEmojiis > 0)
+                {
+                    string test = br.ReadString();
+                    if (test != "")
+                    {
+                        string key = test;
+                        string imageInB64 = br.ReadString();
+                        //window.smilies.Add(key, generateBMI(Base64ToImage(imageInB64)));
+                        if (!_restarting)
+                            window.addSmilie(key, generateBMI(Base64ToImage(imageInB64)));
+                        string replace = br.ReadString();
+                        string height = br.ReadString();
+                        string width = br.ReadString();
+                        if (!_restarting)
+                            window.sParams.Add(key, new Dictionary<string, string>()
+                                {
+                                    { "Replacement", replace},
+                                    { "Height", height },
+                                    { "Width", width }
+                                });
+                        amountOfEmojiis--;
+                    }
+                }
+
+                bool result;
+                bool.TryParse(isMod, out result);
+                window.updateSettingsInformation(result, nameColor, fontType, fontsize, messagecolor);
+
+                if (_reg)
+                    OnRegisterOK();  // Register is OK.
+                if (!_restarting)
+                    OnLoginOK();  // Login is OK (when registered, automatically logged in)
+                Receiver(); // Time for listening for incoming messages.
+            }
+            else
+            {
+                IMErrorEventArgs err = new IMErrorEventArgs((IMError)ans);
+                if (_reg)
+                    OnRegisterFailed(err);
+                else
+                    OnLoginFailed(err);
+            }
+            if (_conn)
+                CloseConnectionWithServer();
+        }
+
+        #endregion
+
+
+        #region Settings
+        /// <summary>
+        /// 1 - Name Color
+        /// 2 - Font
+        /// 3 - Font Size
+        /// 4 - Message Color
+        /// </summary>
+        /// <param name="setting"></param>
+        public void UpdateSetting(int setting, string settingInfo)
+        {
+            switch (setting)
+            {
+                case 1:
+                    bw.Write(Protocols.UP_Name_Color);
+                    bw.Write(settingInfo);
+                    bw.Flush();
+                    break;
+                case 2:
+                    bw.Write(Protocols.UP_Font);
+                    bw.Write(settingInfo);
+                    bw.Flush();
+                    break;
+                case 3:
+                    bw.Write(Protocols.UP_Font_Size);
+                    bw.Write(settingInfo);
+                    bw.Flush();
+                    break;
+                case 4:
+                    bw.Write(Protocols.UP_Message_Color);
+                    bw.Write(settingInfo);
+                    bw.Flush();
+                    break;
+            }
+        }
+        #endregion
 
         #region Events
 
@@ -277,73 +385,6 @@ namespace Messenger.Classes.Server
         }
 
         #endregion
-
-        void SetupConn()  // Setup connection and login
-        {
-            // Hello OK, so answer.
-            bw.Write(Protocols.IM_Hello);
-
-            bw.Write(_reg ? Protocols.IM_Register : Protocols.IM_Login);  // Login or register
-            bw.Write(_username);
-            bw.Write(_password);
-            bw.Flush();
-
-            byte ans = br.ReadByte();  // Read answer.
-            if (ans == Protocols.IM_OK)  // Login/register OK
-            {
-
-                string isMod = br.ReadString();
-                string nameColor = br.ReadString();
-                string fontType = br.ReadString();
-                string fontsize = br.ReadString();
-                string messagecolor = br.ReadString();
-
-                byte amountOfEmojiis = br.ReadByte();
-                while (amountOfEmojiis > 0)
-                {
-                    string test = br.ReadString();
-                    if (test != "")
-                    {
-                        string key = test;
-                        string imageInB64 = br.ReadString();
-                        //window.smilies.Add(key, generateBMI(Base64ToImage(imageInB64)));
-                        if (!_restarting)
-                            window.addSmilie(key, generateBMI(Base64ToImage(imageInB64)));
-                        string replace = br.ReadString();
-                        string height = br.ReadString();
-                        string width = br.ReadString();
-                        if (!_restarting)
-                            window.sParams.Add(key, new Dictionary<string, string>()
-                                {
-                                    { "Replacement", replace},
-                                    { "Height", height },
-                                    { "Width", width }
-                                });
-                        amountOfEmojiis--;
-                    }
-                }
-
-                bool result;
-                bool.TryParse(isMod, out result);
-                window.updateSettingsInformation(result, nameColor, fontType, fontsize, messagecolor);
-
-                if (_reg)
-                    OnRegisterOK();  // Register is OK.
-                if (!_restarting)
-                    OnLoginOK();  // Login is OK (when registered, automatically logged in)
-                Receiver(); // Time for listening for incoming messages.
-            }
-            else
-            {
-                IMErrorEventArgs err = new IMErrorEventArgs((IMError)ans);
-                if (_reg)
-                    OnRegisterFailed(err);
-                else
-                    OnLoginFailed(err);
-            }
-            if (_conn)
-                CloseConnectionWithServer();
-        }
 
 
         #region Receiver

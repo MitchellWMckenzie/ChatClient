@@ -275,8 +275,16 @@ namespace Messenger
 
         #endregion
 
-        #region Setting User Information
+        #region Settings
 
+        /// <summary>
+        /// Used to update the information of the user. Updates the settings window.
+        /// </summary>
+        /// <param name="isMod">Whether the user is a moderator or greater</param>
+        /// <param name="nameColor">The usersnames color</param>
+        /// <param name="font">The users font</param>
+        /// <param name="fontsize">The users font size</param>
+        /// <param name="messageColor">The font color</param>
         public void updateSettingsInformation(bool isMod, string nameColor, string font, string fontsize, string messageColor)
         {
             Dispatcher.Invoke(new Action(() =>
@@ -329,6 +337,67 @@ namespace Messenger
                 }
                 clrMessageColor.SelectedIndex = index;
             }));
+        }
+
+        
+        /// <summary>
+        /// Handles Name Color changes
+        /// </summary>
+        private bool handleNameColor = true;
+        private void cbo_NameClose(object sender, EventArgs e)
+        {
+            if (handleNameColor) HandleName();
+            handleNameColor = true;
+        }
+        private void HandleName()
+        {
+            string setting = clrMessage.SelectedItem.ToString().Split(new string[] { ": " }, StringSplitOptions.None).Last();
+            server.UpdateSetting(1, setting);
+        }
+
+        /// <summary>
+        /// Handle Font Changes
+        /// </summary>
+        private bool handleFontChange = true;
+        private void cbo_FontClose(object sender, EventArgs e)
+        {
+            if (handleFontChange) HandleFont();
+            handleFontChange = true;
+        }
+        private void HandleFont()
+        {
+            string setting = clrFont.SelectedItem.ToString().Split(new string[] { ": " }, StringSplitOptions.None).Last();
+            server.UpdateSetting(2, setting);
+        }
+
+        /// <summary>
+        /// Handles Font Size Changes
+        /// </summary>
+        private bool handleFontSizeChange = true;
+        private void cbo_FontSizeClose(object sender, EventArgs e)
+        {
+            if (handleFontSizeChange) HandleFontSize();
+            handleFontSizeChange = true;
+        }
+        private void HandleFontSize()
+        {
+            string setting = clrFontSize.SelectedItem.ToString().Split(new string[] { ": " }, StringSplitOptions.None).Last();
+            server.UpdateSetting(3, setting);
+        }
+
+        /// <summary>
+        /// Changes Message Color Changes
+        /// </summary>
+        private bool handleMessageChange = true;
+        private void cbo_MessageColorClose(object sender, EventArgs e)
+        {
+            if (handleMessageChange) HandleMessageColor();
+            handleMessageChange = true;
+        }
+        private void HandleMessageColor()
+        {
+            string setting = clrMessageColor.SelectedItem.ToString().Split(new string[] { ": " }, StringSplitOptions.None).Last();
+            server.UpdateSetting(4, setting);
         }
 
         #endregion
