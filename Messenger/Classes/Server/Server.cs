@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Windows;
 using System.Collections.ObjectModel;
+using System.Timers;
 
 namespace Messenger.Classes.Server
 {
@@ -58,6 +59,9 @@ namespace Messenger.Classes.Server
             get { return _trieLoggingIn; }
         }
 
+
+        //Timers
+        System.Timers.Timer restartTimer;
         #endregion
 
 
@@ -70,8 +74,8 @@ namespace Messenger.Classes.Server
             this.serverAddress = serverAddress;
             this.window = window;
             SnippingTool.AreaSelected += OnAreaSelected;
+            setUpTimers();
         }
-
 
         #region Snipping Tool
 
@@ -85,7 +89,6 @@ namespace Messenger.Classes.Server
         }
 
         #endregion
-
 
         #region Set Up Connection
 
@@ -250,6 +253,7 @@ namespace Messenger.Classes.Server
                     OnRegisterOK();  // Register is OK.
                 if (!_restarting)
                     OnLoginOK();  // Login is OK (when registered, automatically logged in)
+                window.stopRestarting();
                 Receiver(); // Time for listening for incoming messages.
             }
             else
@@ -265,7 +269,6 @@ namespace Messenger.Classes.Server
         }
 
         #endregion
-
 
         #region Settings
         /// <summary>
@@ -352,7 +355,6 @@ namespace Messenger.Classes.Server
 
         #endregion
 
-
         #region Send Message
 
         public void SendMessage(string to, string msg, string color)
@@ -385,7 +387,6 @@ namespace Messenger.Classes.Server
         }
 
         #endregion
-
 
         #region Receiver
         [STAThread]
@@ -598,7 +599,8 @@ namespace Messenger.Classes.Server
                             msg.clrBtnWidth = "0";
                             msg.clrVis = Visibility.Hidden;
                             msg.textInformation = new ObservableCollection<TextInfo>();
-                            msg.textInformation.Add(new TextInfo(null, "", "", Visibility.Hidden, "<Message Removed>", msg.args.TextColor, msg.args.Font, msg.args.Size, Visibility.Visible));
+                            msg.textInformation.Add(new TextInfo(null, "", "", Visibility.Hidden, "<Message Removed>",
+                                msg.args.TextColor, msg.args.Font, msg.args.Size, Visibility.Visible));
                             window.updateMessages();
                             break;
                         }
@@ -624,6 +626,23 @@ namespace Messenger.Classes.Server
                             }
                             break;
                         }
+
+
+                        case Protocols.IM_Reconnecting:
+                        {
+                            OnMessageReceived(new IMReceivedEventArgs(-1, "SYSTEM", "Server restarting. Disconnecting...", 
+                                "White", "Segoe UI", "16", "White", false));
+                            window.clearUsers();
+                            _restarting = true;
+                            
+                            //Start the timer
+                            restartTimer.Enabled = true;
+
+                            window.startRestarting();
+                            
+                            CloseConnectionWithServer();
+                            break;
+                        }
                     }
                 }
             }
@@ -631,6 +650,38 @@ namespace Messenger.Classes.Server
 
             _logged = false;
         }
+        #endregion
+
+        #region Timer Functions
+
+        private void setUpTimers()
+        {
+            //Set up the timer
+            restartTimer = new System.Timers.Timer();
+            restartTimer.Elapsed += new ElapsedEventHandler(restartTimerTicks);
+            restartTimer.Interval = 8000;
+        }
+
+        /// <summary>
+        /// Ticks when the server is restarting so the client can reconnet.
+        /// </summary>
+        private void restartTimerTicks(object source, ElapsedEventArgs e)
+        {
+            OnMessageReceived(new IMReceivedEventArgs(-1, "SYSTEM", "Trying to reconnect to server...",
+                                "White", "Segoe UI", "16", "White", false));
+            if (!_conn)
+            {
+                CreateConnectionWithServer();
+            }
+            if (_conn)
+            {
+                connect(_username, _password, false);
+                window.clearUsers();
+                window.refreshList();
+                restartTimer.Enabled = false;
+            }
+        }
+
         #endregion
 
         #region Image Conversion Methods

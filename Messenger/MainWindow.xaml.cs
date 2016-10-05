@@ -82,6 +82,28 @@ namespace Messenger
             lstUsers.ItemsSource = listofUsers;
         }
 
+        #region Restarting Server
+        public void startRestarting()
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                txtMessage.IsEnabled = false;
+                btnSnip.IsEnabled = false;
+                btnSendMessage.IsEnabled = false;
+                settingsButton.IsEnabled = false;
+            }));
+        }
+        public void stopRestarting()
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                txtMessage.IsEnabled = true;
+                btnSnip.IsEnabled = true;
+                settingsButton.IsEnabled = true;
+                btnSendMessage.IsEnabled = true;
+            }));
+        }
+        #endregion
 
         #region Load information from file
         string usersFileName = Environment.CurrentDirectory + "\\information.dat";
