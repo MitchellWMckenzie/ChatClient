@@ -338,6 +338,26 @@ namespace Messenger
         {
             FlshWindow.StopFlashingWindow(this);
         }
+
+        /// <summary>
+        /// Hides the current users logged in depending no the width of the screen.
+        /// </summary>
+        private void WindowResized(object sender, SizeChangedEventArgs e)
+        {
+            if (this.Width < 400)
+            {
+                lstUsers.Visibility = Visibility.Hidden;
+                gridCol.Width = new GridLength(0);
+            }
+            else
+            {
+                if (lstUsers.Visibility == Visibility.Hidden)
+                {
+                    lstUsers.Visibility = Visibility.Visible;
+                    gridCol.Width = new GridLength(130);
+                }
+            }
+        }
         #endregion
 
         #region Events
