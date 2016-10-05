@@ -23,6 +23,7 @@ using Messenger.Classes.PictureScreen;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using Messenger.Classes.Login;
+using Messenger.Classes.Server.Display_Parts;
 
 namespace Messenger
 {
@@ -40,8 +41,10 @@ namespace Messenger
         ProgressDialogController progCntrler;
 
         //Stores the Smilies with their parameters
-        public Dictionary<string, BitmapImage> smilies = new Dictionary<string, BitmapImage>() { };
+        public Dictionary<string, Emoji> smilies = new Dictionary<string, Emoji>() { };
         public Dictionary<string, Dictionary<string, string>> sParams = new Dictionary<string, Dictionary<string, string>>() { };
+
+        public ObservableCollection<Emoji> emojiListItems = new ObservableCollection<Emoji>();
 
         //Store the list of users
         public ObservableCollection<Users> listofUsers = new ObservableCollection<Users>();
@@ -80,6 +83,9 @@ namespace Messenger
             //Set the item source of the messages
             txtMessagesView.ItemsSource = txtMessages;
             lstUsers.ItemsSource = listofUsers;
+
+            //Set the list of emoji's
+            emojiiList.ItemsSource = emojiListItems;
         }
 
         #region Restarting Server
@@ -175,7 +181,7 @@ namespace Messenger
             Dispatcher.Invoke(new Action(() =>
             {
                 user.setMainWindow(this);
-                user.Source = smilies["message"];
+                user.Source = smilies["message"].image;
                 listofUsers.Add(user);
             }));
         }
@@ -291,8 +297,23 @@ namespace Messenger
             //On the proper thread add the smilie to the dictionary
             Dispatcher.Invoke(new Action(() =>
             {
-                this.smilies.Add(key, img);
+                Emoji emoji = new Emoji();
+
+                emoji.key = key;
+                emoji.image = img;
+                this.smilies.Add(key, emoji);
+
+                emojiListItems.Add(emoji);
+
+
+                emojiiList.Items.Refresh();
             }));
+        }
+
+        private void EmojiButtonClick(object sender, RoutedEventArgs e)
+        {
+            RightWindowCommandsOverlayBehavior = MahApps.Metro.Controls.WindowCommandsOverlayBehavior.Never;
+            emojiFlyout.IsOpen = true;
         }
 
         #endregion
@@ -368,6 +389,12 @@ namespace Messenger
         }
 
         
+
+        private void saveToClipboard(object sender, RoutedEventArgs e)
+        {
+            server.setPasteToClipboard(chkClipboard.IsChecked == true);
+        }
+
         /// <summary>
         /// Handles Name Color changes
         /// </summary>
@@ -382,6 +409,8 @@ namespace Messenger
             string setting = clrMessage.SelectedItem.ToString().Split(new string[] { ": " }, StringSplitOptions.None).Last();
             server.UpdateSetting(1, setting);
         }
+
+
 
         /// <summary>
         /// Handle Font Changes
@@ -485,6 +514,7 @@ namespace Messenger
                 #pragma warning disable CS4014 // Makes the warning go away.
                 IncrementProgressBar(progCntrler, "Successfully logged in to the account!", 800, 1000, 0);
                 CloseFlyover(progCntrler, 2000, true);
+                emojiiList.Items.Refresh();
             }));
         }
 
@@ -907,6 +937,7 @@ namespace Messenger
         {
             settingsButton.Visibility = Visibility.Visible;
             ServerLocationInfo.Visibility = Visibility.Hidden;
+            emojiButton.Visibility = Visibility.Visible;
             ServerLocationInfo.Width = 0;
         }
 
@@ -938,6 +969,17 @@ namespace Messenger
             if (item != null && item.IsSelected)
             {
                 txtMessage.AppendText(((Users)item.Content).Name);
+            }
+        }
+        #endregion
+
+        #region Emoji Clicked
+        private void EmojiClicked(object sender, MouseButtonEventArgs e)
+        {
+            var item = sender as System.Windows.Controls.ListViewItem;
+            if (item != null)
+            {
+                txtMessage.AppendText(sParams[item.Tag.ToString()]["Replacement"]);
             }
         }
         #endregion
@@ -984,6 +1026,5 @@ namespace Messenger
         }
 
         #endregion
-
     }
 }

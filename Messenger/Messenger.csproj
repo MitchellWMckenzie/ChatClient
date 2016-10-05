@@ -82,6 +82,7 @@
     <Compile Include="Classes\PictureScreen\PictureScreen.xaml.cs">
       <DependentUpon>PictureScreen.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Classes\Server\Display Parts\Emoji.cs" />
     <Compile Include="Classes\Server\Display Parts\Message.cs" />
     <Compile Include="Classes\Server\Display Parts\TextInfo.cs" />
     <Compile Include="Classes\Server\Display Parts\Users.cs" />

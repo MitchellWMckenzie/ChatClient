@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Messenger.Classes.Server.Display_Parts;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -133,9 +134,9 @@ namespace Messenger.Classes
                     window.sParams.ElementAt(x).Value.TryGetValue("Width", out width);
 
                     found = true;
-                    BitmapImage img;
+                    Emoji img;
                     window.smilies.TryGetValue(window.sParams.ElementAt(x).Key, out img);
-                    emojii.Source = img;
+                    emojii.Source = img.image;
 
                     if (width == "+6")
                     {

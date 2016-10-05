@@ -323,6 +323,11 @@ namespace Messenger.Classes.Server
                     break;
             }
         }
+
+        public void setPasteToClipboard(bool setting)
+        {
+            PasteToClipboard = setting;
+        }
         #endregion
 
         #region Events
@@ -523,7 +528,7 @@ namespace Messenger.Classes.Server
                                 BitmapSource bitmap = ConvertBitmap(temp);
 
                                 //If copy to clipboard is checked
-                                if (window.chkClipboard.IsChecked == true)
+                                if (PasteToClipboard)
                                 {
                                     Application.Current.Dispatcher.Invoke(new Action(() =>
                                     {
