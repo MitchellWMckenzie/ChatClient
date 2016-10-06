@@ -431,7 +431,9 @@
                             <ItemsControl x:Name="emojiiList">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Image Width="50" Height="50" Source="{Binding Path=imgSource}" Tag="{Binding Path=key}" Visibility="Visible" MouseLeftButtonDown="EmojiClicked" MouseLeftButtonDown="Image_MouseLeftButtonDown"/>
+                                    <Button Width="50" Height="50" Style="{DynamicResource NoChromeButton}" Tag="{Binding Path=key}" Click="EmojiClicked" >
+                                        <Image Width="50" Height="50" Source="{Binding Path=imgSource}" Visibility="Visible"/>
+                                    </Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                                 <ItemsControl.ItemsPanel>

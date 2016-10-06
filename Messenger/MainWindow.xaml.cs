@@ -963,7 +963,7 @@ namespace Messenger
         #endregion
 
         #region List Of Users
-        private void ListOfUsersClicked(object sender, MouseButtonEventArgs e)
+        private void ListOfUsersClicked(object sender, RoutedEventArgs e)
         {
             var item = sender as System.Windows.Controls.ListViewItem;
             if (item != null && item.IsSelected)
@@ -974,9 +974,9 @@ namespace Messenger
         #endregion
 
         #region Emoji Clicked
-        private void EmojiClicked(object sender, MouseButtonEventArgs e)
+        private void EmojiClicked(object sender, RoutedEventArgs e)
         {
-            var item = sender as System.Windows.Controls.ListViewItem;
+            var item = sender as System.Windows.Controls.Button;
             if (item != null)
             {
                 txtMessage.AppendText(sParams[item.Tag.ToString()]["Replacement"]);
